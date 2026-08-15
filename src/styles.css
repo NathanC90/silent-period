@@ -132,10 +132,6 @@ h3 {
   color: var(--muted);
   transition: background 0.15s, color 0.15s;
 }
-.tab:hover {
-  background: var(--panel);
-  color: var(--text);
-}
 .tab.on {
   background: var(--panel-2);
   color: var(--text);
@@ -187,10 +183,6 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 6px;
   color: var(--muted);
-}
-.scrub-marks button:hover {
-  border-color: var(--accent);
-  color: var(--text);
 }
 .scrub-note {
   font-size: 11px;
@@ -347,10 +339,6 @@ h3 {
   font-size: 13px;
   color: var(--muted);
 }
-.quicklog button:hover {
-  border-color: var(--jade);
-  color: var(--text);
-}
 
 .big-num {
   font-size: 40px;
@@ -378,9 +366,6 @@ h3 {
   padding: 13px 10px;
   border-radius: 9px;
   transition: opacity 0.2s;
-}
-.tasks li:hover {
-  background: var(--panel-2);
 }
 .tasks li.done {
   opacity: 0.42;
@@ -540,10 +525,6 @@ h3 {
   color: var(--muted);
   font-size: 14px;
 }
-.reveal:hover {
-  border-color: var(--jade);
-  color: var(--text);
-}
 
 .grades {
   display: grid;
@@ -568,19 +549,6 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 3px;
   padding: 0 4px;
-}
-.grade:hover {
-  color: var(--text);
-}
-.grade-again:hover {
-  border-color: var(--accent);
-}
-.grade-hard:hover {
-  border-color: var(--gold);
-}
-.grade-good:hover,
-.grade-easy:hover {
-  border-color: var(--jade);
 }
 
 .deck-stats {
@@ -665,9 +633,6 @@ h3 {
   color: var(--text);
   text-decoration: none;
   border-bottom: 1px solid var(--line);
-}
-.source a:hover {
-  border-color: var(--jade);
 }
 .footnote {
   font-size: 11.5px;
@@ -781,11 +746,11 @@ h3 {
   }
 
   /* The sidebar collapses into a compact header bar. Left as a column it ate a
-     full phone screen before any content appeared. */
+     full phone screen before any content appeared.
+     Deliberately NOT sticky: pinning the whole bar held 27% of a phone screen
+     permanently, most of it the preview scrubber. The tabs pin instead, below. */
   .nav {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    position: static;
     height: auto;
     flex-direction: row;
     flex-wrap: wrap;
@@ -824,27 +789,35 @@ h3 {
     font-size: 10px;
   }
 
-  /* Four fixed columns rather than a scroller — a half-clipped Output tab reads
-     as a rendering bug, and horizontal scroll hides that a tab exists at all. */
+  /* Tab bar pinned to the thumb rather than the top. Four fixed columns, never a
+     scroller — a half-clipped Output tab reads as a rendering bug, and horizontal
+     scroll hides that a fourth tab exists at all. */
   .nav nav {
-    order: 3;
-    width: 100%;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 20;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    gap: 2px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    background: rgba(15, 17, 23, 0.94);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
   }
   .tab {
+    flex-direction: column;
     justify-content: center;
-    padding: 7px 2px;
-    gap: 4px;
+    gap: 1px;
+    padding: 6px 2px;
     white-space: nowrap;
   }
   .tab-ja {
     width: auto;
-    font-size: 12.5px;
+    font-size: 14px;
   }
   .tab-en {
-    font-size: 12px;
+    font-size: 10px;
+    letter-spacing: 0.05em;
   }
   /* The padlock is redundant on mobile — the gate screen says so in full, and the
      extra glyph is what pushed 発話 onto a second line. */
@@ -852,9 +825,9 @@ h3 {
     display: none;
   }
 
-  /* Preview control drops below the content it controls. */
+  /* Preview control scrolls away with the header now that it is not pinned. */
   .scrub {
-    order: 4;
+    order: 3;
     width: 100%;
     margin-top: 0;
     padding: 10px 12px;
@@ -863,8 +836,9 @@ h3 {
     display: none;
   }
 
+  /* Clear the fixed tab bar so the last panel is not trapped underneath it. */
   .main {
-    padding: 22px 16px 60px;
+    padding: 22px 16px calc(96px + env(safe-area-inset-bottom, 0px));
   }
   .grid-top {
     grid-template-columns: 1fr;
@@ -873,10 +847,130 @@ h3 {
     grid-template-columns: 1fr;
     gap: 3px;
   }
+  /* The card and its grade row have to share one screen. At desktop proportions
+     the grades landed below the fold, forcing a scroll after every single card —
+     which is the one interaction you repeat hundreds of times. */
+  .view {
+    gap: 16px;
+  }
+  .view-head h1 {
+    font-size: 28px;
+  }
+  .card {
+    min-height: 180px;
+    padding: 20px;
+    gap: 14px;
+    border-radius: 14px;
+  }
   .card-ja {
-    font-size: 62px;
+    font-size: 54px;
+  }
+  .card-reading {
+    font-size: 19px;
+  }
+  .card-gloss {
+    font-size: 15.5px;
   }
   .grades {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .grade {
+    padding: 9px 0;
+    font-size: 12.5px;
+  }
+  .grade kbd {
+    display: none;
+  }
+  .deck-stats {
+    gap: 26px;
+  }
+}
+
+/* ---------- pointer affordances ---------- */
+
+/* Hover states are gated behind a real pointer. On a touchscreen a tap leaves
+   :hover stuck on the element, so untapped tabs and buttons kept rendering as
+   though they were active. */
+@media (hover: hover) {
+  .tab:hover {
+    background: var(--panel);
+    color: var(--text);
+  }
+  .scrub-marks button:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .quicklog button:hover {
+    border-color: var(--jade);
+    color: var(--text);
+  }
+  .tasks li:hover {
+    background: var(--panel-2);
+  }
+  .reveal:hover {
+    border-color: var(--jade);
+    color: var(--text);
+  }
+  .grade:hover {
+    color: var(--text);
+  }
+  .grade-again:hover {
+    border-color: var(--accent);
+  }
+  .grade-hard:hover {
+    border-color: var(--gold);
+  }
+  .grade-good:hover,
+  .grade-easy:hover {
+    border-color: var(--jade);
+  }
+  .source a:hover {
+    border-color: var(--jade);
+  }
+}
+
+/* Touch gets press feedback instead, since there is no hover to preview with. */
+@media (hover: none) {
+  .tab:active,
+  .grade:active,
+  .reveal:active,
+  .quicklog button:active,
+  .scrub-marks button:active,
+  .drill button:active,
+  .check:active {
+    opacity: 0.6;
+  }
+}
+
+/* Stop iOS from auto-inflating text in the narrow single-column layout. */
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Comfortable tap targets — the grade row and quick-log chips were built for a
+   mouse and fell under the 44px minimum on a phone. */
+@media (max-width: 860px) {
+  .grade {
+    min-height: 52px;
+  }
+  .quicklog button,
+  .scrub-marks button {
+    min-height: 40px;
+  }
+  .check {
+    width: 26px;
+    height: 26px;
+  }
+  .source a {
+    display: inline-block;
+    padding: 6px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
   }
 }
