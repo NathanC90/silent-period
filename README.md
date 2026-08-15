@@ -45,12 +45,24 @@ Runs the assert-based self-check over the two pieces of non-trivial logic: day g
 | --- | --- |
 | `src/protocol.ts` | Phases, day gating, daily targets, the task prescription |
 | `src/srs.ts` | SM-2 scheduler, ease/interval clamps, the daily new-card budget |
+| `src/speech.ts` | Japanese voice selection and pronunciation playback |
 | `src/store.ts` | localStorage-backed state and the review session queue |
 | `src/deck.ts` | Frequency-ordered seed vocabulary |
 | `src/library.ts` | Graded catalogue of free input sources |
 | `src/selfcheck.ts` | The runnable check |
 
 State is entirely local — no backend, no accounts, nothing leaves the browser.
+
+## Pronunciation
+
+Revealing a card speaks it, and the button next to the reading replays it (or press space). This uses the browser's built-in speech synthesiser — no audio files, no network, nothing to license.
+
+Two things worth knowing:
+
+- It speaks the **kana reading, never the kanji**. 人 alone is ひと or じん depending on the word, and the synthesiser has no context to choose.
+- Voice choice is not left to the platform default. macOS and iOS list Kyoko and Otoya alongside novelty character voices (Eddy, Grandma, Rocko…), and taking the first match alphabetically lands on a cartoon. `PREFERRED` in `speech.ts` names the good ones.
+
+It is synthesised speech, so treat it as a rough guide to the sounds — **not** as a model for pitch accent, which TTS gets wrong often enough to matter. The listening hours are what teach that.
 
 ## Notes
 

@@ -25,6 +25,7 @@ import {
   MAX_INTERVAL_DAYS,
   type Card,
 } from "./srs";
+import { pickJapaneseVoice } from "./speech";
 
 // --- protocol: phases tile the whole programme without gaps ---
 for (let d = 1; d <= TOTAL_DAYS; d++) {
@@ -140,5 +141,47 @@ assert.equal(
 
 // Grading a card must not re-arm it as new.
 assert.equal(schedule(newCard("k", T), "good", T).firstSeen, T, "firstSeen survives scheduling");
+
+// --- speech: pick a Japanese voice, and admit it when there is none ---
+const enUS = { lang: "en-US", name: "Samantha", localService: true };
+const jaRemote = { lang: "ja-JP", name: "Google 日本語", localService: false };
+const jaLocal = { lang: "ja-JP", name: "Kyoko", localService: true };
+
+assert.equal(pickJapaneseVoice([]), null, "no voices at all yields null");
+assert.equal(pickJapaneseVoice([enUS]), null, "an English-only device yields null");
+assert.equal(pickJapaneseVoice([enUS, jaRemote]), jaRemote, "finds ja among other languages");
+
+// Kyoko is a named-good voice, so it wins regardless of ordering.
+assert.equal(
+  pickJapaneseVoice([enUS, jaRemote, jaLocal]),
+  jaLocal,
+  "a known-good voice wins over an unnamed one",
+);
+
+// The bug this guards: macOS lists novelty character voices alphabetically ahead
+// of Kyoko, so taking the first local ja voice picked a cartoon.
+const novelty = [
+  { lang: "ja-JP", name: "Eddy (日文（日本）)", localService: true },
+  { lang: "ja-JP", name: "Grandma (日文（日本）)", localService: true },
+  { lang: "ja-JP", name: "Kyoko", localService: true },
+  { lang: "ja-JP", name: "Rocko (日文（日本）)", localService: true },
+];
+assert.equal(pickJapaneseVoice(novelty)?.name, "Kyoko", "Kyoko beats the novelty voices");
+
+// With nothing recognisable, still prefer something that works offline.
+const unknown = [
+  { lang: "ja-JP", name: "Cloud Voice A", localService: false },
+  { lang: "ja-JP", name: "Offline Voice B", localService: true },
+];
+assert.equal(
+  pickJapaneseVoice(unknown)?.name,
+  "Offline Voice B",
+  "unrecognised names fall back to a local voice",
+);
+
+// Platforms disagree on the separator, and 'java'-like tags must not match.
+assert.equal(pickJapaneseVoice([{ lang: "ja_JP", name: "Otoya" }])?.name, "Otoya", "ja_JP matches");
+assert.equal(pickJapaneseVoice([{ lang: "ja", name: "Bare" }])?.name, "Bare", "bare ja matches");
+assert.equal(pickJapaneseVoice([{ lang: "jav", name: "Javanese" }]), null, "jav is not Japanese");
 
 console.log("selfcheck: all assertions passed");
