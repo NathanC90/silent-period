@@ -1,6 +1,8 @@
 # Silent Period
 
-A private study build: what would a "200-day input protocol" language app actually look like, applied to Japanese?
+**Live: https://nathanc90.github.io/silent-period/**
+
+A study build: what would a "200-day input protocol" language app actually look like, applied to Japanese?
 
 This exists to answer a curiosity question, not as a product or a portfolio piece.
 
@@ -21,6 +23,8 @@ The interesting design constraint is that the app **removes choice**:
 Four phases across 200 days: Calibration (1–28), Silent Input (29–89), First Voice (90–119), Consolidation (120–200).
 
 ## Running it
+
+Deployed to GitHub Pages on every push to `main`; `npm run check` gates the deploy. Or locally:
 
 ```bash
 npm install
